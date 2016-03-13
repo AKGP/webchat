@@ -1,0 +1,167 @@
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title></title>
+	<script src="https://code.jquery.com/jquery-2.2.1.min.js"></script>
+	 <!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
+
+	<style type="text/css">
+	#chat{
+		width: 400px;
+		height:500px;
+		overflow: auto;
+		background-color: #FDE3A7;
+		border-radius:10px;
+		}
+	img{
+		width: 100px;
+    	height:120px;
+    	border-radius:10px;
+    	background-color: #FFF;
+	}	
+
+	#contentWrap{
+		display:none;
+
+	}
+	#chatWrap{
+		float:left;
+		
+
+	}
+	.new-message{
+		    margin-left: 10px;
+    background-color: #FFF;
+    padding-left: 10px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+	}
+	.user{
+	width:20px;
+	/*height:20px;*/
+	border-radius:50%;
+	font-size:15px;
+	color:#fff;
+	line-height:20px;
+	text-align:center;
+	background:#000
+
+	}
+	.msg-txt:hover{
+		background-color: #ecf0f1;
+		border-radius: 4px;
+		color:#000;
+	}
+	.msg-txt{
+		
+		margin:10px 10px 10px 10px;
+	}
+	.msg-img:hover{
+		
+		border-radius: 4px;
+		color:#000;
+	}
+	.msg-img{
+		
+		margin:10px 10px 10px 10px;
+	}
+	
+	</style>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+</head>
+<body>
+<div class="container">
+<div id="nickWrap">
+<form id="setNick">
+	<p>Pick a username</p>
+	<p id="nickError"></p>
+	<input id="nickname" type="text" autocomplete="off" ></input>
+	<button type="submit"><i class="fa fa-commenting"></i></button>
+</form>
+</div>
+<div id="contentWrap"><p>WebChat</p>
+	<div id="chatWrap">
+		<div id="chat"></div>
+		<div id="inputWrap">
+		<form id="send-message">
+		<div class="row" ><button class="btn col-xs-2 col-md-2 "id="message-btn"><i class="fa fa-paper-plane"></i></button>
+			<input id="message" type="text" autocomplete="off"></input>
+			<input type="file" id="siofu_input" style="display:none" autocomplete="off" />
+			<input type="submit" style="display:none"></input>
+			<button class='btn col-md-2 col-xs-2' id="file-btn" > <i class="fa fa-paperclip"></i></button></div>
+		</form>
+		</div>
+		</div>
+	</div>
+	<div id="users"></div>
+</div>
+</div>
+<script src="https://code.jquery.com/jquery-2.2.1.min.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script src="/siofu/client.js"></script>
+<script>
+	var socket = io.connect();
+	var message = $('#message');
+	var chat = $('#chat');
+	var nickname = $('#nickname');
+	var uploader = new SocketIOFileUpload(socket);
+	uploader.listenOnInput(document.getElementById("siofu_input"));
+	$('#file-btn').click(function(){
+		$('#siofu_input').click();
+	});
+	$('#setNick').submit(function(e){
+		e.preventDefault();
+		socket.emit('new user',nickname.val(),function(data){
+			if(data){
+				$('#nickWrap').hide();
+				$('#contentWrap').show();
+			}else{
+				$('#nickError').html('Its Already Taken');
+			}
+		});
+		nickname.val('');
+	});
+	socket.on('usernames',function(data){
+		var html = '<b>Online Users<br></b>';
+		for(var i =0;i<data.length;i++){
+			html+=data[i]+"</br>";
+		}
+		$('#users').html(html);
+	});
+	$('#send-message').submit(function(e){
+		e.preventDefault();
+		if(message.val()){
+			socket.emit('send message',message.val());
+		}
+		message.val('');
+		return false;
+	});
+
+	$('#message-btn').click(function(){
+		$('#send-message').submit(function(e){
+		e.preventDefault();
+		if(message.val()){
+			socket.emit('send message',message.val());
+		}
+		message.val('');
+		return false;
+	});
+	});
+	socket.on('new message',function(data){
+		chat.append('<div class="msg-txt"><a style="text-decoration:none; color:#2c3e50">'+data.nick+'</a><div style="color:#FFF">'+data.msg+'</div></div>');
+	});
+	socket.on('file-upload',function(data){
+		console.log(data);
+		var path = data.filepath.substr(6);
+		console.log(path);
+		$('#chat').append('<div class="msg-img"><a style="text-decoration:none; color:#2c3e50" >'+data.nick+'</a>'+'<a href="'+path+'" target="_blank"><img src="'+path+'" > </a></div></br>');
+	});
+	
+</script>
+</body>
+</html>

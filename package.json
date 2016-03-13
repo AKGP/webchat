@@ -1,0 +1,17 @@
+{
+  "name": "mychat",
+  "version": "1.0.0",
+  "description": "\"Internship Assignment\"",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.13.4",
+    "http": "0.0.0",
+    "socket.io": "^1.4.5",
+    "socketio-file-upload": "^0.4.6"
+  }
+}
