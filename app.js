@@ -54,7 +54,11 @@ io.sockets.on('connection',function(socket){
 	uploader.dir = 'public/img';
 	uploader.listen(socket);
 	uploader.on("saved", function(event){
-        io.sockets.emit("file-upload",{filepath:event.file.pathName,nick:socket.nickname});
+		var time = String(new Date()); 
+		var currtime = time.substr(16,9);
+		var currdate = time.substr(4,11);
+		var currday = time.substr(0,3);
+        io.sockets.emit("file-upload",{filepath:event.file.pathName,nick:socket.nickname,time:currtime,date:currdate,day:currday});
     });
 });
 console.log("Running");
