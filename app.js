@@ -13,11 +13,15 @@ app.get('/',function(req,res){
 io.sockets.on('connection',function(socket){
 
 	//On sending message
-
+	
 	socket.on('send message',function(data){
-		io.sockets.emit('new message',{msg:data,nick:socket.nickname});
+		var time = String(new Date()); 
+		var currtime = time.substr(16,9);
+		var currdate = time.substr(4,11);
+		var currday = time.substr(0,3);
+		io.sockets.emit('new message',{msg:data,nick:socket.nickname,time:currtime,date:currdate,day:currday});
 	});
-
+	
 	//Addition of new User
 
 	socket.on('new user',function(data,callback){
