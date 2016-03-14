@@ -116,6 +116,7 @@
 	});
 	$('#setNick').submit(function(e){
 		e.preventDefault();
+		if(nickname.val()!=""){
 		socket.emit('new user',nickname.val(),function(data){
 			if(data){
 				$('#nickWrap').hide();
@@ -123,7 +124,10 @@
 			}else{
 				$('#nickError').html('Its Already Taken');
 			}
-		});
+		});}
+		else{
+			$('#nickError').html('You Cannot Be an unknown person :P ');
+		}
 		nickname.val('');
 	});
 	socket.on('usernames',function(data){
